@@ -18,6 +18,7 @@ import PolyBool from "polybooljs";
 import lineclip from "lineclip";
 import SseMsg from "../../common/SseMsg";
 import $ from "jquery";
+import Sse3dPlaneEstimator from "./tools/Sse3dPlaneEstimator";
 
 const PI = Math.PI;
 const DOUBLEPI = PI * 2;
@@ -391,6 +392,30 @@ export default class SseEditor3d extends React.Component {
             this.editingClassIndex = objDesc.index;
             this.updateClassFilter(this.editingClassIndex);
         });
+
+        this.onMsg("estimator", () => {
+            try {
+                let estimator = new Sse3dPlaneEstimator(this.cloudData, this.selection)
+                this.cloudData.forEach((pt, idx) => {
+                    pt.x
+                })
+                let oldSelectionSize = this.selection.size
+                let estimatedPoints = estimator.estimate()
+                estimatedPoints.forEach(idx => this.addIndexToSelection(idx));
+                this.notifySelectionChange();
+                this.sendMsg("alert", {
+                    autoHide: true,
+                    message: "Estimated plane from " + oldSelectionSize + " points",
+                    buttonText: "OK"
+                });
+            } catch (err) {
+                this.sendMsg("alert", {
+                    autoHide: false,
+                    message: "Plane estimation error: " + err.message,
+                    buttonText: "OK"
+                });
+            }
+        })
 
         this.onMsg("selector", () => this.activateTool(this.selector));
         this.onMsg("rectangle", () => this.activateTool(this.rectangleSelector));

@@ -3,7 +3,7 @@ import React from 'react';
 import SseToolbar from "../../common/SseToolbar";
 import SseBranding from "../../common/SseBranding";
 import {
-    CircleOutline, FileDownloadOutline, Gesture, Minus, Plus, PlusMinus, Redo, SquareOutline,
+    CircleOutline, FileDownloadOutline, Gesture, Minus, Plus, PlusMinus, Redo, SquareOutline, SkewMore,
     Undo
 } from 'mdi-material-ui';
 
@@ -19,6 +19,7 @@ export default class SseToolbar3d extends SseToolbar {
         super.componentDidMount();
 
 
+        this.addCommand("estimatorCommand", "Plane Estimator", false, "P", "estimator", SkewMore, undefined, undefined);
         this.addCommand("selectorCommand", "Lasso Selector", 1, "H", "selector", Gesture, undefined, undefined);
         this.addCommand("rectangleCommand", "Rectangle Selector", 1, "J", "rectangle", SquareOutline, undefined, undefined);
         this.addCommand("circleCommand", "Circle Selector", 1, "K", "circle", CircleOutline, undefined, undefined);
@@ -48,6 +49,10 @@ export default class SseToolbar3d extends SseToolbar {
         return (
             <div className="hflex flex-justify-content-space-around sse-toolbar toolbar-3d no-shrink">
                 <SseBranding/>
+                <div className="vflex">
+                    <div className="tool-title">Plane Estimation Tool</div>
+                    {this.renderCommand("estimatorCommand")}
+                </div>
                 <div className="vflex">
                     <div className="tool-title">Selection Tool</div>
                     <div className="hflex">
