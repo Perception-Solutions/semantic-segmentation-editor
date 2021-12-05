@@ -18,6 +18,7 @@ export default class SseToolbar3d extends SseToolbar {
     componentDidMount() {
         super.componentDidMount();
 
+        this.addSlider("estimatorRangeSlider", "Maximum distance to plane", "estimatorRange", 0, 1, 0.06, 0.01, undefined);
 
         this.addCommand("estimatorCommand", "Plane Estimator", false, "P", "estimator", SkewMore, undefined, undefined);
         this.addCommand("selectorCommand", "Lasso Selector", 1, "H", "selector", Gesture, undefined, undefined);
@@ -51,7 +52,10 @@ export default class SseToolbar3d extends SseToolbar {
                 <SseBranding/>
                 <div className="vflex">
                     <div className="tool-title">Plane Estimation Tool</div>
-                    {this.renderCommand("estimatorCommand")}
+                    <div className="hflex">
+                        {this.renderSlider("estimatorRangeSlider")}
+                        {this.renderCommand("estimatorCommand")}
+                    </div>
                 </div>
                 <div className="vflex">
                     <div className="tool-title">Selection Tool</div>

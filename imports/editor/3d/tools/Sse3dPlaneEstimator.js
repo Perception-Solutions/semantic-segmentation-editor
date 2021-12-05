@@ -20,6 +20,10 @@ export default class Sse3dPlaneEstimator {
         }
     }
 
+    setEstimationRange(range) {
+        this.distanceThreshold = range
+    }
+
     estimate() {
         let basePoints = [];
         this.startPoints.forEach((idx) => {

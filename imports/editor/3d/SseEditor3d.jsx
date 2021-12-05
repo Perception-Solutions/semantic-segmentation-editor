@@ -396,11 +396,12 @@ export default class SseEditor3d extends React.Component {
         this.onMsg("estimator", () => {
             try {
                 let estimator = new Sse3dPlaneEstimator(this.cloudData, this.selection)
-                this.cloudData.forEach((pt, idx) => {
-                    pt.x
-                })
+                if (this.planeEstimatorRange) {
+                    estimator.setEstimationRange(this.planeEstimatorRange)
+                }
                 let oldSelectionSize = this.selection.size
                 let estimatedPoints = estimator.estimate()
+                this.clearSelection()
                 estimatedPoints.forEach(idx => this.addIndexToSelection(idx));
                 this.notifySelectionChange();
                 this.sendMsg("alert", {
@@ -415,6 +416,10 @@ export default class SseEditor3d extends React.Component {
                     buttonText: "OK"
                 });
             }
+        })
+
+        this.onMsg("estimatorRange", (arg) => {
+            this.planeEstimatorRange = arg.value
         })
 
         this.onMsg("selector", () => this.activateTool(this.selector));
