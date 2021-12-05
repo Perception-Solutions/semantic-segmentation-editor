@@ -61,7 +61,8 @@ export default class Sse3dPlaneEstimator {
         points.forEach((point, idx) => {
             points[idx] = numeric.sub(point, centroid)
         })
-        var normal = numeric.svd(points).V[2]
+        let svdV = numeric.svd(points).V
+        var normal = numeric.transpose(svdV)[2]
         normal = normal.concat(numeric.neg(numeric.dot(normal, centroid)))
 
         return numeric.div(normal, numeric.norm2(normal.slice(0, -1)))
