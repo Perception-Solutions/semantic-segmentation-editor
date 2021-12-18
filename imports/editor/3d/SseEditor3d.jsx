@@ -348,6 +348,14 @@ export default class SseEditor3d extends React.Component {
         });
     }
 
+    showPopupMessage(message) {
+        this.sendMsg("alert", {
+            autoHide: false,
+            message: message,
+            buttonText: "OK"
+        });
+    }
+
     componentDidMount() {
         SseMsg.register(this);
         this.init();
@@ -395,26 +403,32 @@ export default class SseEditor3d extends React.Component {
 
         this.onMsg("estimator", () => {
             try {
-                let estimator = new Sse3dPlaneEstimator(this.cloudData, this.selection)
+                if (typeof this.planeEstimatorBase == 'undefined') {
+                    throw new Error("Base points for plane estimator were not defined!");
+                }
+
+                let estimator = new Sse3dPlaneEstimator(this.cloudData, this.planeEstimatorBase)
                 if (this.planeEstimatorRange) {
                     estimator.setEstimationRange(this.planeEstimatorRange)
                 }
-                let oldSelectionSize = this.selection.size
                 let estimatedPoints = estimator.estimate()
                 this.clearSelection()
                 estimatedPoints.forEach(idx => this.addIndexToSelection(idx));
                 this.notifySelectionChange();
-                this.sendMsg("alert", {
-                    autoHide: true,
-                    message: "Estimated plane from " + oldSelectionSize + " points",
-                    buttonText: "OK"
-                });
+                this.showPopupMessage("Estimated plane from " + this.planeEstimatorBase.size + " points");
             } catch (err) {
-                this.sendMsg("alert", {
-                    autoHide: false,
-                    message: "Plane estimation error: " + err.message,
-                    buttonText: "OK"
-                });
+                this.showPopupMessage("Plane estimation error: " + err.message);
+            }
+        })
+
+        this.onMsg("estimatorBase", () => {
+            if (this.selection.size < 3) {
+                this.showPopupMessage(
+                    "Not enough points for plane estimation: only " + this.selection.size + " points were selected!"
+                );
+            } else {
+                this.planeEstimatorBase = new Set(this.selection);
+                this.showPopupMessage("Updated base points for plane estimation: " + this.planeEstimatorBase.size);
             }
         })
 

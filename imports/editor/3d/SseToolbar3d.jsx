@@ -4,7 +4,7 @@ import SseToolbar from "../../common/SseToolbar";
 import SseBranding from "../../common/SseBranding";
 import {
     CircleOutline, FileDownloadOutline, Gesture, Minus, Plus, PlusMinus, Redo, SquareOutline, SkewMore,
-    Undo
+    Undo, Refresh
 } from 'mdi-material-ui';
 
 export default class SseToolbar3d extends SseToolbar {
@@ -19,6 +19,7 @@ export default class SseToolbar3d extends SseToolbar {
         super.componentDidMount();
 
         this.addSlider("estimatorRangeSlider", "Maximum distance to plane", "estimatorRange", 0, 1, 0.06, 0.01, undefined);
+        this.addCommand("estimatorBaseCommand", "Update Plane Estimator base points", false, "[", "estimatorBase", Refresh, undefined, undefined);
 
         this.addCommand("estimatorCommand", "Plane Estimator", false, "P", "estimator", SkewMore, undefined, undefined);
         this.addCommand("selectorCommand", "Lasso Selector", 1, "H", "selector", Gesture, undefined, undefined);
@@ -55,6 +56,7 @@ export default class SseToolbar3d extends SseToolbar {
                     <div className="hflex">
                         {this.renderSlider("estimatorRangeSlider")}
                         {this.renderCommand("estimatorCommand")}
+                        {this.renderCommand("estimatorBaseCommand")}
                     </div>
                 </div>
                 <div className="vflex">
