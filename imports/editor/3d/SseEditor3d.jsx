@@ -35,6 +35,7 @@ export default class SseEditor3d extends React.Component {
         new OrbitControls(THREE);
 
         this.autoFilterMode = false;
+        this.estimateOnlyVoid = true;
         this.globalBoxMode = true;
         this.selectionOutlineMode = true;
         this.selectionMode = "add";
@@ -401,6 +402,10 @@ export default class SseEditor3d extends React.Component {
             this.updateClassFilter(this.editingClassIndex);
         });
 
+        this.onMsg("estimateVoid", ({value}) => {
+            this.estimateOnlyVoid = value;
+        })
+
         this.onMsg("estimator", () => {
             try {
                 if (typeof this.planeEstimatorBase == 'undefined') {
@@ -413,7 +418,11 @@ export default class SseEditor3d extends React.Component {
                 }
                 let estimatedPoints = estimator.estimate()
                 this.clearSelection()
-                estimatedPoints.forEach(idx => this.addIndexToSelection(idx));
+                estimatedPoints.forEach(idx => {
+                    if (!this.estimateOnlyVoid || this.cloudData[idx].classIndex === 0) {
+                        this.addIndexToSelection(idx)
+                    }
+                });
                 this.notifySelectionChange();
                 this.showPopupMessage("Estimated plane from " + this.planeEstimatorBase.size + " points");
             } catch (err) {
