@@ -40,6 +40,7 @@
     "lineclip": "1.1.5",
     "mdi-material-ui": "6.21.0",
     "mousetrap": "1.6.2",
+    "numeric": "^1.2.6",
     "paper": "0.11.8",
     "point-in-polygon-extended": "0.0.1",
     "polybooljs": "1.2.0",

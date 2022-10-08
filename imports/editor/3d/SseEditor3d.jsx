@@ -18,6 +18,7 @@ import PolyBool from "polybooljs";
 import lineclip from "lineclip";
 import SseMsg from "../../common/SseMsg";
 import $ from "jquery";
+import Sse3dPlaneEstimator from "./tools/Sse3dPlaneEstimator";
 
 const PI = Math.PI;
 const DOUBLEPI = PI * 2;
@@ -34,6 +35,7 @@ export default class SseEditor3d extends React.Component {
         new OrbitControls(THREE);
 
         this.autoFilterMode = false;
+        this.estimateOnlyVoid = true;
         this.globalBoxMode = true;
         this.selectionOutlineMode = true;
         this.selectionMode = "add";
@@ -347,6 +349,14 @@ export default class SseEditor3d extends React.Component {
         });
     }
 
+    showPopupMessage(message) {
+        this.sendMsg("alert", {
+            autoHide: false,
+            message: message,
+            buttonText: "OK"
+        });
+    }
+
     componentDidMount() {
         SseMsg.register(this);
         this.init();
@@ -391,6 +401,49 @@ export default class SseEditor3d extends React.Component {
             this.editingClassIndex = objDesc.index;
             this.updateClassFilter(this.editingClassIndex);
         });
+
+        this.onMsg("estimateVoid", ({value}) => {
+            this.estimateOnlyVoid = value;
+        })
+
+        this.onMsg("estimator", () => {
+            try {
+                if (typeof this.planeEstimatorBase == 'undefined') {
+                    throw new Error("Base points for plane estimator were not defined!");
+                }
+
+                let estimator = new Sse3dPlaneEstimator(this.cloudData, this.planeEstimatorBase)
+                if (this.planeEstimatorRange) {
+                    estimator.setEstimationRange(this.planeEstimatorRange)
+                }
+                let estimatedPoints = estimator.estimate()
+                this.clearSelection()
+                estimatedPoints.forEach(idx => {
+                    if (!this.estimateOnlyVoid || this.cloudData[idx].classIndex === 0) {
+                        this.addIndexToSelection(idx)
+                    }
+                });
+                this.notifySelectionChange();
+                this.showPopupMessage("Estimated plane from " + this.planeEstimatorBase.size + " points");
+            } catch (err) {
+                this.showPopupMessage("Plane estimation error: " + err.message);
+            }
+        })
+
+        this.onMsg("estimatorBase", () => {
+            if (this.selection.size < 3) {
+                this.showPopupMessage(
+                    "Not enough points for plane estimation: only " + this.selection.size + " points were selected!"
+                );
+            } else {
+                this.planeEstimatorBase = new Set(this.selection);
+                this.showPopupMessage("Updated base points for plane estimation: " + this.planeEstimatorBase.size);
+            }
+        })
+
+        this.onMsg("estimatorRange", (arg) => {
+            this.planeEstimatorRange = arg.value
+        })
 
         this.onMsg("selector", () => this.activateTool(this.selector));
         this.onMsg("rectangle", () => this.activateTool(this.rectangleSelector));

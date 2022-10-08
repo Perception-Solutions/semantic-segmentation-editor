@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Checkbox, FormControlLabel, FormGroup, IconButton} from '@material-ui/core';
+import {Button, Checkbox, FormControlLabel, FormGroup, IconButton, Input} from '@material-ui/core';
 import Mousetrap from "mousetrap";
 import SseMsg from "./SseMsg";
 
@@ -17,6 +17,7 @@ export default class SseToolbar extends React.Component {
         this.state = {};
         this.toggleSet = new Set();
         this.commands = new Map();
+        this.sliders = new Map();
         this.toggleCommand = new Map();
         this.checkboxes = new Map();
         this.pendingState = {};
@@ -76,6 +77,33 @@ export default class SseToolbar extends React.Component {
         }
     }
 
+    renderSlider(name) {
+        const sliderDesc = this.sliders.get(name);
+        const tippyKey = "#" + name + "Help";
+
+        if (!sliderDesc)
+            return null;
+        else {
+            return (<div
+                className={"vflex flex-align-items-center "} title={sliderDesc.title}
+                data-tippy-html={$(tippyKey).length ? tippyKey : ""}>
+                <Input
+                    defaultValue={sliderDesc.defaultValue}
+                    onChange={(e) => {
+                        this.sendMsg(sliderDesc.actionMessage, {value: Number(e.target.value)})
+                    }}
+                    inputProps={{
+                        step: sliderDesc.step,
+                        min: sliderDesc.startValue,
+                        max: sliderDesc.endValue,
+                        type: 'number'
+                    }}
+                />
+                <span className="title">{sliderDesc.title}</span>
+            </div>);
+        }
+    }
+
     renderCheckbox(name, init) {
         if (this.state[name + "Check"] == undefined) {
             const o = {};
@@ -116,6 +144,12 @@ export default class SseToolbar extends React.Component {
                 this.setState(this.pendingState);
             }, 10);
         }
+    }
+
+    addSlider(name, title, actionMessage, startValue, endValue, defaultValue, step, initialState) {
+        const sliderInfo = {name, title, actionMessage, startValue, endValue, defaultValue, step, initialState};
+        this.sliders.set(name, sliderInfo);
+        this.state[name] = initialState || enabled
     }
 
     addCommand(name, title, isToggle, shortcut, actionMessage, icon, initialState, legend) {

@@ -3,8 +3,8 @@ import React from 'react';
 import SseToolbar from "../../common/SseToolbar";
 import SseBranding from "../../common/SseBranding";
 import {
-    CircleOutline, FileDownloadOutline, Gesture, Minus, Plus, PlusMinus, Redo, SquareOutline,
-    Undo
+    CircleOutline, FileDownloadOutline, Gesture, Minus, Plus, PlusMinus, Redo, SquareOutline, SkewMore,
+    Undo, Refresh
 } from 'mdi-material-ui';
 
 export default class SseToolbar3d extends SseToolbar {
@@ -18,7 +18,11 @@ export default class SseToolbar3d extends SseToolbar {
     componentDidMount() {
         super.componentDidMount();
 
+        this.addSlider("estimatorRangeSlider", "Maximum distance to plane", "estimatorRange", 0, 1, 0.06, 0.01, undefined);
+        this.addCommand("estimatorBaseCommand", "Update Plane Estimator base points", false, "[", "estimatorBase", Refresh, undefined, undefined);
+        this.addCommand("estimatorOnlyVoid", "Estimate with only void points", false, "]", "estimateVoid-checkbox");
 
+        this.addCommand("estimatorCommand", "Plane Estimator", false, "P", "estimator", SkewMore, undefined, undefined);
         this.addCommand("selectorCommand", "Lasso Selector", 1, "H", "selector", Gesture, undefined, undefined);
         this.addCommand("rectangleCommand", "Rectangle Selector", 1, "J", "rectangle", SquareOutline, undefined, undefined);
         this.addCommand("circleCommand", "Circle Selector", 1, "K", "circle", CircleOutline, undefined, undefined);
@@ -48,6 +52,15 @@ export default class SseToolbar3d extends SseToolbar {
         return (
             <div className="hflex flex-justify-content-space-around sse-toolbar toolbar-3d no-shrink">
                 <SseBranding/>
+                <div className="vflex">
+                    <div className="tool-title">Plane Estimation Tool</div>
+                    <div className="hflex">
+                        {this.renderSlider("estimatorRangeSlider")}
+                        {this.renderCommand("estimatorCommand")}
+                        {this.renderCommand("estimatorBaseCommand")}
+                        {this.renderCheckbox("estimatorOnlyVoid", true)}
+                    </div>
+                </div>
                 <div className="vflex">
                     <div className="tool-title">Selection Tool</div>
                     <div className="hflex">
